@@ -1,0 +1,17 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js
+1 info using npm@10.9.2
+2 info using node@v22.17.0
+3 silly config load:file:C:\Program Files\nodejs\node_modules\npm\npmrc
+4 silly config load:file:C:\projects\темтовое\calendar-app\.npmrc
+5 silly config load:file:C:\Users\maste\.npmrc
+6 silly config load:file:C:\Users\maste\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm install bcryptjs
+8 verbose argv "install" "bcryptjs"
+9 verbose logfile logs-max:10 dir:C:\projects\темтовое\calendar-app\.npm-cache\_logs\2026-03-10T18_12_22_511Z-
+10 verbose logfile C:\projects\темтовое\calendar-app\.npm-cache\_logs\2026-03-10T18_12_22_511Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4345298944 maxSize:1086324736 maxEntrySize:543162368
+13 silly idealTree buildDeps
+14 silly fetch manifest bcryptjs@*
+15 silly packumentCache full:https://registry.npmjs.org/bcryptjs cache-miss
+16 http fetch GET https://registry.npmjs.org/bcryptjs attempt 1 failed with EACCES
