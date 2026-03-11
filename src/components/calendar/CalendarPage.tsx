@@ -681,9 +681,10 @@ const HeaderHint = styled.div`
 `;
 
 const Wrap = styled.main`
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 14px 14px 34px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 14px 18px 34px;
 `;
 
 const AuthCard = styled.section`
@@ -907,6 +908,7 @@ const WeekHeader = styled.div`
   gap: 0;
   border: 1px solid var(--border);
   border-bottom: none;
+  width: 100%;
 `;
 
 const Weekday = styled.div`
@@ -929,6 +931,7 @@ const Grid = styled.div`
   gap: 0;
   border: 1px solid var(--border);
   border-top: none;
+  width: 100%;
 `;
 
 const Ghost = styled.div`

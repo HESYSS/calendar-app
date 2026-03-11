@@ -152,7 +152,7 @@ export default function DayCell({
 }
 
 const Cell = styled.div<{ $inMonth: boolean; $over: boolean }>`
-  height: 168px;
+  height: 230px;
   background: ${(p) => (p.$inMonth ? "var(--cell)" : "var(--cell-dim)")};
   border-right: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
@@ -162,7 +162,7 @@ const Cell = styled.div<{ $inMonth: boolean; $over: boolean }>`
   transition: outline-color 120ms ease;
 
   @media (min-width: 920px) {
-    height: 176px;
+    height: 260px;
   }
 `;
 
