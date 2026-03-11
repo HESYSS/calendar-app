@@ -379,7 +379,18 @@ export default function CalendarPage() {
             {theme === "dark" ? "Light" : "Dark"}
           </HeaderBtn>
           {user ? (
-            <HeaderUser title={user.email}>{user.email}</HeaderUser>
+            <HeaderAccountHover>
+              <HeaderUser title={user.email}>{user.email}</HeaderUser>
+              <HeaderLogoutBtn
+                onClick={() => {
+                  fetch("/api/auth/logout", { method: "POST" })
+                    .catch(() => undefined)
+                    .finally(() => setUser(null));
+                }}
+              >
+                Log out
+              </HeaderLogoutBtn>
+            </HeaderAccountHover>
           ) : (
             <HeaderHint>Sign in to add cards</HeaderHint>
           )}
@@ -387,157 +398,142 @@ export default function CalendarPage() {
       </AppHeader>
 
       <Wrap>
-      {!user ? (
-        <AuthCard>
-          <AuthHeader>
-            <AuthTitle>{authMode === "login" ? "Log in" : "Create account"}</AuthTitle>
-            <AuthSub>
-              {authMode === "login" ? (
-                <>
-                  No account?{" "}
-                  <AuthLinkBtn onClick={() => setAuthMode("register")}>Register</AuthLinkBtn>
-                </>
-              ) : (
-                <>
-                  Already have an account?{" "}
-                  <AuthLinkBtn onClick={() => setAuthMode("login")}>Log in</AuthLinkBtn>
-                </>
-              )}
-            </AuthSub>
-          </AuthHeader>
+        <TopBar>
+          <Controls>
+            <LeftControls>
+              <MonthNav aria-label="Month navigation">
+                <NavBtn onClick={() => moveMonth(-1)} aria-label="Previous month">
+                  {"<"}
+                </NavBtn>
+                <MonthLabel>{monthLabel(month)}</MonthLabel>
+                <NavBtn onClick={() => moveMonth(1)} aria-label="Next month">
+                  {">"}
+                </NavBtn>
+              </MonthNav>
+            </LeftControls>
 
-          <AuthForm
-            onSubmit={(e) => {
-              e.preventDefault();
-              setAuthBusy(true);
-              setAuthError(null);
-              setAuthFieldErrors({});
-              (async () => {
-                const endpoint = authMode === "login" ? "/api/auth/login" : "/api/auth/register";
-                const res = await fetch(endpoint, {
-                  method: "POST",
-                  headers: { "content-type": "application/json" },
-                  body: JSON.stringify({ email: authEmail, password: authPassword }),
-                });
-                const data = (await res.json().catch(() => ({}))) as {
-                  user?: { id: string; email: string };
-                  error?: string;
-                  details?: { fieldErrors?: Record<string, string[]>; formErrors?: string[] };
-                };
-                if (!res.ok || !data.user) {
-                  const fieldErrors = data.details?.fieldErrors || {};
-                  setAuthFieldErrors({
-                    email: fieldErrors.email?.[0],
-                    password: fieldErrors.password?.[0],
-                  });
-                  const generic = (data.error || "").trim();
-                  const genericIsUseless = generic.toLowerCase() === "invalid body";
-                  const message =
-                    data.details?.formErrors?.[0] ||
-                    fieldErrors.email?.[0] ||
-                    fieldErrors.password?.[0] ||
-                    (genericIsUseless ? "" : generic) ||
-                    "Auth failed";
-                  throw new Error(message);
-                }
-                setUser(data.user);
-                setAuthPassword("");
-              })()
-                .catch((err) => setAuthError(err instanceof Error ? err.message : "Auth failed"))
-                .finally(() => setAuthBusy(false));
-            }}
-          >
-            <AuthInput
-              value={authEmail}
-              onChange={(e) => setAuthEmail(e.target.value)}
-              placeholder="Email"
-              autoComplete="email"
-              inputMode="email"
-              disabled={authBusy}
-            />
-            {authFieldErrors.email ? <AuthFieldError>{authFieldErrors.email}</AuthFieldError> : null}
-            <AuthInput
-              value={authPassword}
-              onChange={(e) => setAuthPassword(e.target.value)}
-              placeholder="Password (min 8 chars)"
-              type="password"
-              autoComplete={authMode === "login" ? "current-password" : "new-password"}
-              disabled={authBusy}
-            />
-            {authFieldErrors.password ? <AuthFieldError>{authFieldErrors.password}</AuthFieldError> : null}
-            {authError ? <AuthError>{authError}</AuthError> : null}
-            <AuthBtn type="submit" disabled={authBusy || !authEmail.trim() || authPassword.length < 1}>
-              {authBusy ? "..." : authMode === "login" ? "Log in" : "Register"}
-            </AuthBtn>
-          </AuthForm>
-        </AuthCard>
-      ) : null}
+            <CenterControls>
+              <Search
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Filter tasks by text..."
+                aria-label="Search tasks"
+              />
+            </CenterControls>
 
-      <TopBar>
-        <TitleBlock />
-
-        <Controls>
-          <ControlGroup>
-            <NavBtn onClick={() => moveMonth(-1)} aria-label="Previous month">
-              ‹
-            </NavBtn>
-            <MonthLabel>{monthLabel(month)}</MonthLabel>
-            <NavBtn onClick={() => moveMonth(1)} aria-label="Next month">
-              ›
-            </NavBtn>
-          </ControlGroup>
-
-          <ControlGroup>
-            <Label>Holidays</Label>
-            <Select
-              value={countryCode}
-              onChange={(e) => setCountryCode(e.target.value.toUpperCase())}
-              aria-label="Country code"
-            >
-              {countries.length > 0 ? (
-                countries.map((c) => (
-                  <option key={c.countryCode} value={c.countryCode}>
-                    {c.name} ({c.countryCode})
-                  </option>
-                ))
-              ) : (
-                <>
-                  <option value="US">United States (US)</option>
-                  <option value="UA">Ukraine (UA)</option>
-                  <option value="GB">United Kingdom (GB)</option>
-                  <option value="DE">Germany (DE)</option>
-                </>
-              )}
-            </Select>
-          </ControlGroup>
-
-          <ControlGroup>
-            <Label>Search</Label>
-            <Search
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Filter tasks by text..."
-            />
-          </ControlGroup>
-
-          {user ? (
-            <ControlGroup>
-              <Label>Account</Label>
-              <AccountRow>
-                <GhostBtn
-                  onClick={() => {
-                    fetch("/api/auth/logout", { method: "POST" })
-                      .catch(() => undefined)
-                      .finally(() => setUser(null));
-                  }}
+            <RightControls>
+              <ControlGroup>
+                <Label>Holidays</Label>
+                <Select
+                  value={countryCode}
+                  onChange={(e) => setCountryCode(e.target.value.toUpperCase())}
+                  aria-label="Country code"
                 >
-                  Log out
-                </GhostBtn>
-              </AccountRow>
-            </ControlGroup>
-          ) : null}
-        </Controls>
-      </TopBar>
+                  {countries.length > 0 ? (
+                    countries.map((c) => (
+                      <option key={c.countryCode} value={c.countryCode}>
+                        {c.name} ({c.countryCode})
+                      </option>
+                    ))
+                  ) : (
+                    <>
+                      <option value="US">United States (US)</option>
+                      <option value="UA">Ukraine (UA)</option>
+                      <option value="GB">United Kingdom (GB)</option>
+                      <option value="DE">Germany (DE)</option>
+                    </>
+                  )}
+                </Select>
+              </ControlGroup>
+            </RightControls>
+          </Controls>
+        </TopBar>
+
+        {!user ? (
+          <AuthCard>
+            <AuthHeader>
+              <AuthTitle>{authMode === "login" ? "Log in" : "Create account"}</AuthTitle>
+              <AuthSub>
+                {authMode === "login" ? (
+                  <>
+                    No account?{" "}
+                    <AuthLinkBtn onClick={() => setAuthMode("register")}>Register</AuthLinkBtn>
+                  </>
+                ) : (
+                  <>
+                    Already have an account?{" "}
+                    <AuthLinkBtn onClick={() => setAuthMode("login")}>Log in</AuthLinkBtn>
+                  </>
+                )}
+              </AuthSub>
+            </AuthHeader>
+
+            <AuthForm
+              onSubmit={(e) => {
+                e.preventDefault();
+                setAuthBusy(true);
+                setAuthError(null);
+                setAuthFieldErrors({});
+                (async () => {
+                  const endpoint = authMode === "login" ? "/api/auth/login" : "/api/auth/register";
+                  const res = await fetch(endpoint, {
+                    method: "POST",
+                    headers: { "content-type": "application/json" },
+                    body: JSON.stringify({ email: authEmail, password: authPassword }),
+                  });
+                  const data = (await res.json().catch(() => ({}))) as {
+                    user?: { id: string; email: string };
+                    error?: string;
+                    details?: { fieldErrors?: Record<string, string[]>; formErrors?: string[] };
+                  };
+                  if (!res.ok || !data.user) {
+                    const fieldErrors = data.details?.fieldErrors || {};
+                    setAuthFieldErrors({
+                      email: fieldErrors.email?.[0],
+                      password: fieldErrors.password?.[0],
+                    });
+                    const generic = (data.error || "").trim();
+                    const genericIsUseless = generic.toLowerCase() === "invalid body";
+                    const message =
+                      data.details?.formErrors?.[0] ||
+                      fieldErrors.email?.[0] ||
+                      fieldErrors.password?.[0] ||
+                      (genericIsUseless ? "" : generic) ||
+                      "Auth failed";
+                    throw new Error(message);
+                  }
+                  setUser(data.user);
+                  setAuthPassword("");
+                })()
+                  .catch((err) => setAuthError(err instanceof Error ? err.message : "Auth failed"))
+                  .finally(() => setAuthBusy(false));
+              }}
+            >
+              <AuthInput
+                value={authEmail}
+                onChange={(e) => setAuthEmail(e.target.value)}
+                placeholder="Email"
+                autoComplete="email"
+                inputMode="email"
+                disabled={authBusy}
+              />
+              {authFieldErrors.email ? <AuthFieldError>{authFieldErrors.email}</AuthFieldError> : null}
+              <AuthInput
+                value={authPassword}
+                onChange={(e) => setAuthPassword(e.target.value)}
+                placeholder="Password (min 8 chars)"
+                type="password"
+                autoComplete={authMode === "login" ? "current-password" : "new-password"}
+                disabled={authBusy}
+              />
+              {authFieldErrors.password ? <AuthFieldError>{authFieldErrors.password}</AuthFieldError> : null}
+              {authError ? <AuthError>{authError}</AuthError> : null}
+              <AuthBtn type="submit" disabled={authBusy || !authEmail.trim() || authPassword.length < 1}>
+                {authBusy ? "..." : authMode === "login" ? "Log in" : "Register"}
+              </AuthBtn>
+            </AuthForm>
+          </AuthCard>
+        ) : null}
 
       <StatusRow>
         <Status>
@@ -625,10 +621,14 @@ export default function CalendarPage() {
 
 const App = styled.main`
   min-height: 100vh;
+  --header-h: 54px;
 `;
 
 const AppHeader = styled.header`
-  height: 54px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: var(--header-h);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -675,6 +675,42 @@ const HeaderUser = styled.div`
   border: 1px solid rgba(255, 255, 255, 0.22);
 `;
 
+const HeaderAccountHover = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+`;
+
+const HeaderLogoutBtn = styled.button`
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-2px);
+  transition: opacity 120ms ease, transform 120ms ease, background 120ms ease;
+
+  ${HeaderAccountHover}:hover & {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  @media (hover: none) {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.2);
+  }
+`;
+
 const HeaderHint = styled.div`
   font-size: 12px;
   opacity: 0.9;
@@ -684,7 +720,7 @@ const Wrap = styled.main`
   width: 100%;
   max-width: none;
   margin: 0;
-  padding: 14px 18px 34px;
+  padding: 0 18px 34px;
 `;
 
 const AuthCard = styled.section`
@@ -770,30 +806,44 @@ const AuthBtn = styled.button`
 
 const TopBar = styled.div`
   position: sticky;
-  top: 54px;
+  top: var(--header-h);
   z-index: 5;
-  display: grid;
-  gap: 10px;
+  display: flex;
   align-items: center;
-  grid-template-columns: 1fr auto;
-  padding: 10px 0 12px;
+  padding: 10px 18px 12px;
+  margin: 0 -18px 8px;
   margin-bottom: 8px;
   background: var(--bg);
-`;
-
-const TitleBlock = styled.div`
-  min-height: 1px;
+  border-bottom: 1px solid var(--border);
 `;
 
 const Controls = styled.div`
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: auto minmax(240px, 1fr) auto;
   gap: 12px;
-  justify-content: flex-start;
+  width: 100%;
+  align-items: center;
 
-  @media (min-width: 920px) {
-    justify-content: flex-end;
+  @media (max-width: 920px) {
+    grid-template-columns: 1fr;
   }
+`;
+
+const LeftControls = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const CenterControls = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const RightControls = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 `;
 
 const ControlGroup = styled.div`
@@ -822,7 +872,10 @@ const Btn = styled.button`
 const MonthLabel = styled.div`
   min-width: 170px;
   text-align: center;
-  padding: 8px 12px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  padding: 0 12px;
   border-radius: 8px;
   background: var(--panel);
   border: 1px solid var(--border);
@@ -839,6 +892,12 @@ const NavBtn = styled(Btn)`
   line-height: 1;
 `;
 
+const MonthNav = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+`;
+
 const Select = styled.select`
   height: 36px;
   border-radius: 8px;
@@ -847,33 +906,16 @@ const Select = styled.select`
   border: 1px solid var(--border);
 `;
 
-const AccountRow = styled.div`
-  display: flex;
-  gap: 8px;
-  align-items: center;
-`;
-
-const GhostBtn = styled.button`
-  height: 36px;
-  padding: 0 12px;
-  border-radius: 8px;
-  background: transparent;
-  border: 1px solid var(--border);
-  cursor: pointer;
-
-  &:hover {
-    background: rgba(0, 0, 0, 0.04);
-  }
-`;
-
 const Search = styled.input`
-  height: 36px;
-  width: min(340px, 70vw);
-  border-radius: 8px;
-  padding: 0 12px;
+  height: 44px;
+  width: 100%;
+  max-width: 920px;
+  border-radius: 10px;
+  padding: 0 14px;
   background: var(--panel);
   border: 1px solid var(--border);
   outline: none;
+  font-size: 15px;
 
   &:focus {
     border-color: rgba(240, 140, 0, 0.55);
