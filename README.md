@@ -33,6 +33,8 @@ MongoDB will be available on `mongodb://localhost:27017`.
 - set `MONGODB_URI` (required)
 - optionally set `MONGODB_DB`
 
+Tip: on some Windows setups, `mongodb://127.0.0.1:27017/?directConnection=true` is more reliable than `localhost`.
+
 4. Run:
 ```bash
 npm run dev

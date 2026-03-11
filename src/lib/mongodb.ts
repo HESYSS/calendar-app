@@ -2,7 +2,9 @@ import { MongoClient } from "mongodb";
 
 const uri =
   process.env.MONGODB_URI ||
-  (process.env.NODE_ENV === "development" ? "mongodb://localhost:27017" : undefined);
+  (process.env.NODE_ENV === "development"
+    ? "mongodb://127.0.0.1:27017/?directConnection=true"
+    : undefined);
 if (!uri) {
   throw new Error(
     "Missing MONGODB_URI environment variable. Create .env.local (see .env.example) or set it in your deployment env vars.",
