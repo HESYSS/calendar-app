@@ -7,17 +7,6 @@ import styled from "styled-components";
 
 import type { Task } from "@/lib/types";
 
-const LABEL_COLORS = ["#37b24d", "#f59f00", "#339af0", "#ae3ec9", "#15aabf", "#f03e3e"];
-
-function pickLabelColors(id: string) {
-  let acc = 0;
-  for (let i = 0; i < id.length; i++) acc = (acc * 31 + id.charCodeAt(i)) >>> 0;
-  const a = LABEL_COLORS[acc % LABEL_COLORS.length]!;
-  const b = LABEL_COLORS[(acc + 2) % LABEL_COLORS.length]!;
-  const c = LABEL_COLORS[(acc + 4) % LABEL_COLORS.length]!;
-  return [a, b, c] as const;
-}
-
 export default function TaskCard({
   task,
   dndEnabled,
@@ -76,11 +65,6 @@ export default function TaskCard({
       $draggable={dndEnabled}
       $editable={editable}
     >
-      <LabelBars aria-hidden="true">
-        {pickLabelColors(task.id).map((c) => (
-          <Bar key={c} $c={c} />
-        ))}
-      </LabelBars>
       {editing ? (
         <EditInput
           ref={inputRef}
@@ -127,19 +111,6 @@ const Card = styled.div<{ $dragging: boolean; $draggable: boolean; $editable: bo
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
   cursor: ${(p) => (p.$draggable ? "grab" : "default")};
   opacity: ${(p) => (!p.$editable ? 0.85 : 1)};
-`;
-
-const LabelBars = styled.div`
-  display: flex;
-  gap: 6px;
-  margin-bottom: 8px;
-`;
-
-const Bar = styled.div<{ $c: string }>`
-  height: 6px;
-  width: 32px;
-  border-radius: 999px;
-  background: ${(p) => p.$c};
 `;
 
 const Row = styled.div`
