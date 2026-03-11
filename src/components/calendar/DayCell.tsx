@@ -153,10 +153,13 @@ export default function DayCell({
 
 const Cell = styled.div<{ $inMonth: boolean; $over: boolean }>`
   height: 230px;
+  display: flex;
+  flex-direction: column;
   background: ${(p) => (p.$inMonth ? "var(--cell)" : "var(--cell-dim)")};
   border-right: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   padding: 10px 10px 12px;
+  overflow: hidden;
   outline: ${(p) => (p.$over ? "2px solid rgba(240, 140, 0, 0.4)" : "none")};
   outline-offset: -2px;
   transition: outline-color 120ms ease;
@@ -218,6 +221,7 @@ const Body = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex: 1;
   min-height: 0;
 `;
 
@@ -228,6 +232,7 @@ const TaskList = styled.div`
   min-height: 0;
   overflow: auto;
   padding-right: 4px;
+  overscroll-behavior: contain;
 
   &::-webkit-scrollbar {
     width: 10px;

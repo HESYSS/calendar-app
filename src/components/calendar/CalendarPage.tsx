@@ -633,8 +633,8 @@ const AppHeader = styled.header`
   align-items: center;
   justify-content: space-between;
   padding: 0 18px;
-  color: #fff;
-  background: linear-gradient(135deg, #f59f00, #f76707);
+  color: var(--header-fg);
+  background: var(--header-bg);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.14);
 `;
 
@@ -653,13 +653,13 @@ const HeaderBtn = styled.button`
   height: 30px;
   padding: 0 10px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  color: #fff;
+  background: var(--header-control-bg);
+  border: 1px solid var(--header-control-border);
+  color: var(--header-fg);
   cursor: pointer;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--header-control-bg-hover);
   }
 `;
 
@@ -671,8 +671,8 @@ const HeaderUser = styled.div`
   font-size: 12px;
   padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: var(--header-control-bg);
+  border: 1px solid var(--header-control-border);
 `;
 
 const HeaderAccountHover = styled.div`
@@ -685,29 +685,14 @@ const HeaderLogoutBtn = styled.button`
   height: 30px;
   padding: 0 10px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  color: #fff;
+  background: var(--header-control-bg);
+  border: 1px solid var(--header-control-border);
+  color: var(--header-fg);
   cursor: pointer;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-2px);
-  transition: opacity 120ms ease, transform 120ms ease, background 120ms ease;
-
-  ${HeaderAccountHover}:hover & {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0);
-  }
-
-  @media (hover: none) {
-    opacity: 1;
-    pointer-events: auto;
-    transform: none;
-  }
+  transition: background 120ms ease;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--header-control-bg-hover);
   }
 `;
 

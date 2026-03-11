@@ -69,9 +69,3 @@ Note: if `next build` fails on Windows with `spawn EPERM` inside a non-ASCII pat
 - `POST /api/tasks/reorder` body: `{ updates: [{ id, date, order }] }`
 - `GET /api/countries`
 - `GET /api/holidays?year=YYYY&countryCode=AA`
-
-## Deploy on Vercel
-
-- Import the GitHub repository in Vercel.
-- Set `MONGODB_URI` (and optionally `MONGODB_DB`) in Vercel project env vars.
-- Deploy.

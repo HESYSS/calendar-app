@@ -20,6 +20,13 @@ export const GlobalStyle = createGlobalStyle`
     --radius: 10px;
     --radius-sm: 8px;
     --scroll-thumb: rgba(0, 0, 0, 0.18);
+
+    /* Header "inverts" in dark theme to stay high-contrast against the page. */
+    --header-bg: linear-gradient(135deg, #f59f00, #f76707);
+    --header-fg: #ffffff;
+    --header-control-bg: rgba(0, 0, 0, 0.14);
+    --header-control-bg-hover: rgba(0, 0, 0, 0.2);
+    --header-control-border: rgba(255, 255, 255, 0.22);
   }
 
   html[data-theme="dark"] {
@@ -37,6 +44,12 @@ export const GlobalStyle = createGlobalStyle`
     --danger: #ff6b6b;
     --shadow: 0 1px 2px rgba(0,0,0,0.25), 0 10px 30px rgba(0,0,0,0.35);
     --scroll-thumb: rgba(255, 255, 255, 0.22);
+
+    --header-bg: linear-gradient(135deg, #ffffff, #f1f3f5);
+    --header-fg: rgba(0, 0, 0, 0.86);
+    --header-control-bg: rgba(0, 0, 0, 0.06);
+    --header-control-bg-hover: rgba(0, 0, 0, 0.1);
+    --header-control-border: rgba(0, 0, 0, 0.14);
   }
 
   *, *::before, *::after { box-sizing: border-box; }
