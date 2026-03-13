@@ -1,38 +1,34 @@
 import { MongoClient } from "mongodb";
 
-const uri =
-  process.env.MONGODB_URI ||
-  (process.env.NODE_ENV === "development"
-    ? "mongodb://127.0.0.1:27017/?directConnection=true"
-    : undefined);
-if (!uri) {
-  throw new Error(
-    "Missing MONGODB_URI environment variable. Create .env.local (see .env.example) or set it in your deployment env vars.",
-  );
-}
-
-const options = {};
-
-let client: MongoClient;
-let clientPromise: Promise<MongoClient>;
-
 declare global {
+  // eslint-disable-next-line no-var
   var _mongoClientPromise: Promise<MongoClient> | undefined;
 }
 
-if (process.env.NODE_ENV === "development") {
-  if (!global._mongoClientPromise) {
-    client = new MongoClient(uri, options);
-    global._mongoClientPromise = client.connect();
+function getMongoUri() {
+  const fromEnv = process.env.MONGODB_URI;
+  if (fromEnv) return fromEnv;
+
+  if (process.env.NODE_ENV === "development") {
+    return "mongodb://127.0.0.1:27017/?directConnection=true";
   }
-  clientPromise = global._mongoClientPromise;
-} else {
-  client = new MongoClient(uri, options);
-  clientPromise = client.connect();
+
+  throw new Error(
+    "Missing MONGODB_URI environment variable. Create .env.local (see .env.example) or set it in your deployment env vars (Vercel → Project → Settings → Environment Variables).",
+  );
+}
+
+function getMongoClientPromise() {
+  if (global._mongoClientPromise) return global._mongoClientPromise;
+
+  const uri = getMongoUri();
+  const client = new MongoClient(uri, {});
+  global._mongoClientPromise = client.connect();
+  return global._mongoClientPromise;
 }
 
 export async function getDb() {
-  const client = await clientPromise;
+  const client = await getMongoClientPromise();
   const dbName = process.env.MONGODB_DB || "calendar_tasks";
   return client.db(dbName);
 }
