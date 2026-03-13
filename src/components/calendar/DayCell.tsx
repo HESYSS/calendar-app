@@ -232,7 +232,6 @@ const TaskList = styled.div`
   min-height: 0;
   overflow: auto;
   padding-right: 4px;
-  overscroll-behavior: contain;
 
   &::-webkit-scrollbar {
     width: 10px;
